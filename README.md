@@ -1,2 +1,9 @@
 # Homework-2
-Scalable server design: using thread pools micro batching to manage and load balance active network connections.
+
+___
+### Cloning
+- git clone https://github.com/WaltonMcD/Homework-2.git
+___
+### Gradle
+#### To setup gradle with the current `build.gradle`
+- `gradle build`
