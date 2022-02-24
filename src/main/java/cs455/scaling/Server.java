@@ -30,7 +30,7 @@ public class Server {
 
             //Blocking call
             this.selector.select();
-            System.out.println("\tActivity On Selector.");
+            System.out.println("\tActivity On Selector... ");
 
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
 
@@ -46,6 +46,7 @@ public class Server {
                     register(this.selector, this.serverSocket);
                 }
 
+                // Checks if current is acceptable key has a value to read.
                 if(key.isReadable()){
                     readAndRespond(key);
                 }

@@ -31,7 +31,7 @@ public class Client {
             buffer.clear();
         }
         catch(IOException ioe){
-            System.out.println("Client: " + ioe.getMessage());
+            System.out.println("Client Error: " + ioe.getMessage());
         }
     }
 }
