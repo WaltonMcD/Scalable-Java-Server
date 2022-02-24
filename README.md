@@ -1,2 +1,2 @@
 # Homework-2
-SCALABLE SERVER DESIGN: USING THREAD POOLS &amp; MICRO BATCHING TO MANAGE AND LOAD BALANCE  ACTIVE NETWORK CONNECTIONS 
+Scalable server design: using thread pools micro batching to manage and load balance active network connections.
