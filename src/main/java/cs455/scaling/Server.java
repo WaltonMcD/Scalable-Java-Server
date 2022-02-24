@@ -1,4 +1,4 @@
-package main.java.cs455.scaling;
+package cs455.scaling;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,8 +23,8 @@ public class Server {
         this.serverSocket.register(selector, SelectionKey.OP_ACCEPT);
     }
 
-    public void start() throws IOException {
-
+    public void start() {
+        try{
         while(true){
             System.out.println("Listening For New Connections... ");
 
@@ -37,22 +37,24 @@ public class Server {
             Iterator<SelectionKey> iter = selectedKeys.iterator();
             while(iter.hasNext()){
                 SelectionKey key = iter.next();
-
-                if(key.isValid() == false){
+                
+                if(key.isValid() == false)
                     continue;
-                }
+
                 // isAcceptable checks for potential new clients
-                if(key.isAcceptable()){
+                if(key.isAcceptable())
                     register(this.selector, this.serverSocket);
-                }
 
                 // Checks if current is acceptable key has a value to read.
-                if(key.isReadable()){
+                if(key.isReadable())
                     readAndRespond(key);
-                }
 
                 iter.remove();
             }
+        }
+        }
+        catch(IOException ioe){
+            System.out.println("Server Error: " + ioe.getMessage());
         }
         
     }
@@ -62,7 +64,7 @@ public class Server {
 
         client.configureBlocking(false);
         client.register(this.selector, SelectionKey.OP_READ);
-        System.out.println("New Client Registered... ");
+        System.out.println("\t\tNew Client Registered... ");
     }
 
     private void readAndRespond(SelectionKey key) throws IOException {
@@ -73,15 +75,16 @@ public class Server {
         int bytes = client.read(buffer);
         if(bytes == 1){
             client.close();
-            System.out.println("Client Has Disconnected... ");
+            System.out.println("\t\tClient Has Disconnected... \n");
         }
         else{
             String response = new String(buffer.array());
-            System.out.println("Received: " + response);
+            System.out.println("\t\tReceived: " + response);
 
             buffer.flip();
+            buffer.compact();
+            
             client.write(buffer);
-
             buffer.clear();
         }
     }

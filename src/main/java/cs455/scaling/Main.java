@@ -1,4 +1,4 @@
-package main.java.cs455.scaling;
+package cs455.scaling;
 
 import java.io.IOException;
 import java.net.InetAddress;

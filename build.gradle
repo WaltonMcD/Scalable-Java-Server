@@ -2,8 +2,10 @@ plugins {
     id 'java'
 }
 
+sourceCompatibility = 11
+
 jar {
     manifest {
-        attributes 'Main-Class': 'main.java.cs455.scaling.Main'
+        attributes 'Main-Class': 'cs455.scaling.Main'
     }
 }

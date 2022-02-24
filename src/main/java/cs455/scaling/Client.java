@@ -1,4 +1,4 @@
-package main.java.cs455.scaling;
+package cs455.scaling;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,10 +25,16 @@ public class Client {
             buffer.clear();
 
             client.read(buffer);
-            response = new String(buffer.array()).trim();
+            response = new String(buffer.array());
             System.out.println("Server response: " + response);
 
             buffer.clear();
+            byte[] end = {1};
+            buffer = ByteBuffer.wrap(end);
+
+            client.write(buffer);
+
+            client.close();
         }
         catch(IOException ioe){
             System.out.println("Client Error: " + ioe.getMessage());
