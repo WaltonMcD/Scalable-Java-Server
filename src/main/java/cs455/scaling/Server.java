@@ -82,7 +82,6 @@ public class Server {
             System.out.println("\t\tReceived: " + response);
 
             buffer.flip();
-            buffer.compact();
             
             client.write(buffer);
             buffer.clear();

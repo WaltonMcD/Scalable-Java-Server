@@ -25,7 +25,7 @@ public class Client {
             buffer.clear();
 
             client.read(buffer);
-            response = new String(buffer.array());
+            response = new String(buffer.array()).trim();
             System.out.println("Server response: " + response);
 
             buffer.clear();
