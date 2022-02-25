@@ -1,12 +1,15 @@
 package cs455.scaling;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -45,7 +48,7 @@ public class Server {
                 if(key.isAcceptable())
                     register(this.selector, this.serverSocket);
 
-                // Checks if current is acceptable key has a value to read.
+                // Checks if current clients is acceptable key has a value to read.
                 if(key.isReadable())
                     readAndRespond(key);
 
@@ -56,7 +59,18 @@ public class Server {
         catch(IOException ioe){
             System.out.println("Server Error: " + ioe.getMessage());
         }
-        
+    }
+
+    private String SHA1FromBytes(byte[] data) { 
+        BigInteger hashInt = null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA1");
+            byte[] hash  = digest.digest(data); 
+            hashInt = new BigInteger(1, hash); 
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error SHA1: " + e.getMessage());
+        } 
+        return hashInt.toString(16); 
     }
 
     private void register(Selector selector, ServerSocketChannel serverSocket) throws IOException {
@@ -78,8 +92,9 @@ public class Server {
             System.out.println("\t\tClient Has Disconnected... \n");
         }
         else{
-            String response = new String(buffer.array());
-            System.out.println("\t\tReceived: " + response);
+            byte[] recvBytes = buffer.array();
+            String hash = new String(SHA1FromBytes(recvBytes));
+            System.out.println("\t\tReceived: " + hash);
 
             buffer.flip();
             
