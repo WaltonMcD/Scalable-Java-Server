@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = 11
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'cs455.scaling.Main'
+    }
+}
