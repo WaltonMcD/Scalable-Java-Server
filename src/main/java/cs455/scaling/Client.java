@@ -35,7 +35,7 @@ public class Client {
     
     private byte[] getRandomBytes(){
         Random random = new Random();
-        byte[] randomBytes = new byte[8000];
+        byte[] randomBytes = new byte[1024];
         random.nextBytes(randomBytes);
         return randomBytes;
     }
