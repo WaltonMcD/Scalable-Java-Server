@@ -54,20 +54,21 @@ public class Client {
     }
 
     public void start(){
-        byte[] randomBytes = getRandomBytes();
-        createAndLinkHash(randomBytes);
-        buffer = ByteBuffer.wrap(randomBytes);
+        byte[] randomBytes = getRandomBytes();      //The random bytes that needs to be sent to the server
+        createAndLinkHash(randomBytes);             // create hash and store locally
+        buffer = ByteBuffer.wrap(randomBytes);      // wrap/ load bytes to send to server
 
         try{
-            client.write(buffer);
-            buffer.clear();
+            client.write(buffer);                   //write random bytes to the server
+            buffer.clear();                         //clear the buffer so that we can read later
 
-            client.read(buffer);
-            byte[] recv = buffer.array();
-            String recvHash = new String(SHA1FromBytes(recv));
-            checkAndRemoveHash(recvHash);
+            client.read(buffer);                    //read the buffer
+            byte[] recv = buffer.array();           //convert read stuff to array an store in recv
+            String recvHash = new String(SHA1FromBytes(recv)); //create hash in client to crosscheck with what the server sent 
+            checkAndRemoveHash(recvHash);           // does what the methods says
 
             buffer.clear();
+            // closing connection protocol
             byte[] end = {1};
             buffer = ByteBuffer.wrap(end);
 

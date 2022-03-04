@@ -32,30 +32,30 @@ public class Server {
     public void start() {
         try{
         while(true){
-            System.out.println("Listening For New Connections... ");
+            System.out.println("Listening For New Connections... "); 
 
-            //Blocking call
-            this.selector.select();
-            System.out.println("\tActivity On Selector... ");
+            
+            this.selector.select();                             //Blocking call. 
+            System.out.println("\tActivity On Selector... "); 
 
-            Set<SelectionKey> selectedKeys = selector.selectedKeys();
+            Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
 
-            Iterator<SelectionKey> iter = selectedKeys.iterator();
+            Iterator<SelectionKey> iter = selectedKeys.iterator(); //make the messages iterable
             while(iter.hasNext()){
-                SelectionKey key = iter.next();
+                SelectionKey key = iter.next();                    // get the key
                 
-                if(key.isValid() == false)
+                if(key.isValid() == false)              // corner case 
                     continue;
 
-                // isAcceptable checks for potential new clients
-                if(key.isAcceptable())
-                    register(this.selector, this.serverSocket);
+                
+                if(key.isAcceptable()) // isAcceptable checks for potential new clients
+                    register(this.selector, this.serverSocket); // registers the client to the server
 
-                // Checks if current clients is acceptable key has a value to read.
-                if(key.isReadable())
+                
+                if(key.isReadable()) // Checks if current clients is acceptable key has a value to read.
                     readAndRespond(key);
 
-                iter.remove();
+                iter.remove(); // dont read the same message twice
             }
         }
         }
@@ -85,21 +85,21 @@ public class Server {
     }
 
     private void readAndRespond(SelectionKey key) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(1024); // to store the messages
 
-        SocketChannel client = (SocketChannel) key.channel();
+        SocketChannel client = (SocketChannel) key.channel(); // get the right client 
 
-        int bytes = client.read(buffer);
-        if(bytes == 1){
+        int bytes = client.read(buffer); // read the buffer
+        if(bytes == 1){  //checks for closing protocol
             client.close();
             System.out.println("\t\tClient Has Disconnected... \n");
         }
         else{
-            byte[] recvBytes = buffer.array();
-            String hash = new String(SHA1FromBytes(recvBytes));
+            byte[] recvBytes = buffer.array(); // receive the messages
+            String hash = new String(SHA1FromBytes(recvBytes)); // get the hash to send back to the client
             System.out.println("\t\tReceived: " + hash);
 
-            buffer.flip();
+            buffer.flip(); // flips read and write functinalooty
             
             client.write(buffer);
             buffer.clear();
