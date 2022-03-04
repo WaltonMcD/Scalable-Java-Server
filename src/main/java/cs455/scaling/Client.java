@@ -17,7 +17,7 @@ public class Client {
 
     public Client(String hostName, int portNum) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
-        this.buffer = ByteBuffer.allocate(8000);
+        this.buffer = ByteBuffer.allocate(1024);
         this.hashList = new LinkedList<String>();
     }
 
@@ -35,7 +35,7 @@ public class Client {
     
     private byte[] getRandomBytes(){
         Random random = new Random();
-        byte[] randomBytes = new byte[8000];
+        byte[] randomBytes = new byte[1024];
         random.nextBytes(randomBytes);
         return randomBytes;
     }

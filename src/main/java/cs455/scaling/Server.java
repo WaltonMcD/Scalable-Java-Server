@@ -85,7 +85,7 @@ public class Server {
     }
 
     private void readAndRespond(SelectionKey key) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(8000);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
 
         SocketChannel client = (SocketChannel) key.channel();
 
