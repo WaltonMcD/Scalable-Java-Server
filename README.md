@@ -9,5 +9,5 @@ ___
 - `gradle build`
 ___
 ### Execute
-- `java -jar build/libs/Homework-2.jar cs455.overlay.Main server [PORT]`
-- `java -jar build/libs/Homework-2.jar cs455.overlay.Main client [SERVER_HOST] [PORT]`
+- `java -jar build/libs/Homework-2.jar cs455.scaling.Main server [PORT]`
+- `java -jar build/libs/Homework-2.jar cs455.scaling.Main client [SERVER_HOST] [PORT]`
