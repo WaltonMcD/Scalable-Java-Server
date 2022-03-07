@@ -12,6 +12,13 @@ import java.security.NoSuchAlgorithmException;
 
 
 public class ReadAndRespond {
+    private final ByteBuffer buffer;
+    private final SocketChannel client;
+
+    public ReadAndRespond(SelectionKey key){
+        this.buffer = ByteBuffer.allocate(1024); // to store the messages
+        this.client = (SocketChannel) key.channel(); // get the right client 
+    }
  
     public String SHA1FromBytes(byte[] data) { 
         BigInteger hashInt = null;
@@ -25,10 +32,7 @@ public class ReadAndRespond {
         return hashInt.toString(16); 
     }
 
-    public void readAndRespond(SelectionKey key) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(1024); // to store the messages
-
-        SocketChannel client = (SocketChannel) key.channel(); // get the right client 
+    public void readAndRespond() throws IOException {
 
         int bytes = client.read(buffer); // read the buffer
         if(bytes == 1){  //checks for closing protocol
@@ -40,7 +44,7 @@ public class ReadAndRespond {
             String hash = new String(SHA1FromBytes(recvBytes)); // get the hash to send back to the client
             System.out.println("\t\tReceived: " + hash);
 
-            buffer.flip(); // flips read and write functinalooty
+            buffer.flip(); // flips read and write functionality
             
             client.write(buffer);
             buffer.clear();

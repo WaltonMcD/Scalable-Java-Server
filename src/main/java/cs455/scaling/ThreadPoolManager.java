@@ -1,14 +1,15 @@
 package cs455.scaling;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPoolManager {
     private final Thread[] workerThreads;
-    private final LinkedBlockingQueue<Runnable> workerQueue;
+    private final LinkedBlockingQueue<ReadAndRespond> workerQueue;
 
     public ThreadPoolManager(int threadCount){
         this.workerThreads = new Thread[threadCount];
-        this.workerQueue = new LinkedBlockingQueue<Runnable>();
+        this.workerQueue = new LinkedBlockingQueue<ReadAndRespond>();
         int id = 0;
         for(Thread thread: workerThreads){
             thread = new worker(++id);
@@ -16,7 +17,7 @@ public class ThreadPoolManager {
         }
     }
 
-    public void addTask(Runnable runner){
+    public void addTask(ReadAndRespond runner){
         try {
             workerQueue.put(runner);
         } catch (InterruptedException e) {
@@ -35,9 +36,11 @@ public class ThreadPoolManager {
         public void run(){
             while(true){
                 try {
-                    workerQueue.take().run();
-                } catch (InterruptedException e) {
-                    System.out.println("Error Worker: " + e.getMessage());
+                    if(!workerQueue.isEmpty()){
+                        workerQueue.poll().readAndRespond();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

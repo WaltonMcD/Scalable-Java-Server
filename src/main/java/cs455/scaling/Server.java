@@ -2,16 +2,11 @@ package cs455.scaling;
 
 import java.net.InetSocketAddress;
 import java.io.IOException;
-import java.math.BigInteger;
 
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -20,7 +15,6 @@ public class Server {
     private Selector selector;
     private ServerSocketChannel serverSocket;
     private ThreadPoolManager threadPoolManager;
-    ReadAndRespond readRes = new ReadAndRespond();
     
     public Server(String hostName, int portNum, int threadCount) throws IOException {
         this.selector = Selector.open();
@@ -38,7 +32,6 @@ public class Server {
         while(true){
             System.out.println("Listening For New Connections... "); 
 
-            
             this.selector.select();                             //Blocking call. 
             System.out.println("\tActivity On Selector... "); 
 
@@ -51,14 +44,13 @@ public class Server {
                 if(key.isValid() == false)              // corner case 
                     continue;
 
-                
                 if(key.isAcceptable()) // isAcceptable checks for potential new clients
                     register(this.selector, this.serverSocket); // registers the client to the server
 
-                
-                if(key.isReadable()) // Checks if current clients is acceptable key has a value to read.
-                readRes.readAndRespond(key);
-                //readAndRespond(key);
+                if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
+                    ReadAndRespond readRes = new ReadAndRespond(key);
+                    threadPoolManager.addTask(readRes);
+                }
 
                 iter.remove(); // dont read the same message twice
             }
@@ -67,18 +59,6 @@ public class Server {
         catch(IOException ioe){
             System.out.println("Server Error: " + ioe.getMessage());
         }
-    }
-
-    private String SHA1FromBytes(byte[] data) { 
-        BigInteger hashInt = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash  = digest.digest(data); 
-            hashInt = new BigInteger(1, hash); 
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error SHA1: " + e.getMessage());
-        } 
-        return hashInt.toString(16); 
     }
 
     private void register(Selector selector, ServerSocketChannel serverSocket) throws IOException {
