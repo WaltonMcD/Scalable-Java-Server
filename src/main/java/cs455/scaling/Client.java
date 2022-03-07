@@ -1,12 +1,10 @@
 package cs455.scaling;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -15,13 +13,14 @@ public class Client {
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
     ReadAndRespond readRes = new ReadAndRespond();
+    private int messageRate;
 
-    public Client(String hostName, int portNum) throws IOException {
+    public Client(String hostName, int portNum, int messageRate) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
         this.buffer = ByteBuffer.allocate(1024);
         this.hashList = new LinkedList<String>();
+        this.messageRate = messageRate;
     }
-
     
     private byte[] getRandomBytes(){
         Random random = new Random();
@@ -44,30 +43,28 @@ public class Client {
     }
 
     public void start(){
-        byte[] randomBytes = getRandomBytes();      //The random bytes that needs to be sent to the server
-        createAndLinkHash(randomBytes);             // create hash and store locally
-        buffer = ByteBuffer.wrap(randomBytes);      // wrap/ load bytes to send to server
 
-        try{
-            client.write(buffer);                   //write random bytes to the server
-            buffer.clear();                         //clear the buffer so that we can read later
-
-            client.read(buffer);                    //read the buffer
-            byte[] recv = buffer.array();           //convert read stuff to array an store in recv
-            String recvHash = new String(readRes.SHA1FromBytes(recv)); //create hash in client to crosscheck with what the server sent 
-            checkAndRemoveHash(recvHash);           // does what the methods says
-
-            buffer.clear();
-            // closing connection protocol
-            byte[] end = {1};
-            buffer = ByteBuffer.wrap(end);
-
-            client.write(buffer);
-
-            client.close();
+        while(true){
+            byte[] randomBytes = getRandomBytes();      //The random bytes that needs to be sent to the server
+            createAndLinkHash(randomBytes);             // create hash and store locally
+            buffer = ByteBuffer.wrap(randomBytes);      // wrap/ load bytes to send to server
+    
+            try{
+                client.write(buffer);                   //write random bytes to the server
+                buffer.clear();                         //clear the buffer so that we can read later
+                client.read(buffer);                    //read the buffer          //convert read stuff to array an store in recv
+                String recv = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
+                String recvHash = recv.substring(0,40);
+                System.out.println("Client Received: " + recvHash);
+                checkAndRemoveHash(recvHash);           // does what the methods says
+                buffer.clear();
+                Thread.sleep(1000/messageRate);
+            }  catch(IOException ioe){
+                System.err.println("Client Error: " + ioe.getMessage());
+            } catch(InterruptedException ie){
+                System.err.println("Client failed to sleep: " + ie.getMessage());
+            }
         }
-        catch(IOException ioe){
-            System.out.println("Client Error: " + ioe.getMessage());
-        }
+        
     }
 }
