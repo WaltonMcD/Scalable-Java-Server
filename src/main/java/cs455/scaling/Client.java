@@ -15,11 +15,13 @@ public class Client {
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
     ReadAndRespond readRes = new ReadAndRespond();
+    private int messageRate;
 
-    public Client(String hostName, int portNum) throws IOException {
+    public Client(String hostName, int portNum, int messageRate) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
         this.buffer = ByteBuffer.allocate(1024);
         this.hashList = new LinkedList<String>();
+        this.messageRate = messageRate;
     }
 
     
