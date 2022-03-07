@@ -14,6 +14,7 @@ public class Client {
     private SocketChannel client;
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
+    ReadAndRespond readRes = new ReadAndRespond();
 
     public Client(String hostName, int portNum) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
@@ -21,17 +22,6 @@ public class Client {
         this.hashList = new LinkedList<String>();
     }
 
-    private String SHA1FromBytes(byte[] data) { 
-        BigInteger hashInt = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash  = digest.digest(data); 
-            hashInt = new BigInteger(1, hash); 
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error SHA1: " + e.getMessage());
-        } 
-        return hashInt.toString(16); 
-    }
     
     private byte[] getRandomBytes(){
         Random random = new Random();
@@ -41,7 +31,7 @@ public class Client {
     }
 
     private void createAndLinkHash(byte[] bytes){
-        String hash = SHA1FromBytes(bytes);
+        String hash = readRes.SHA1FromBytes(bytes);
         hashList.add(hash);
         System.out.println("List Size: " + hashList.size());
     }
@@ -64,7 +54,7 @@ public class Client {
 
             client.read(buffer);                    //read the buffer
             byte[] recv = buffer.array();           //convert read stuff to array an store in recv
-            String recvHash = new String(SHA1FromBytes(recv)); //create hash in client to crosscheck with what the server sent 
+            String recvHash = new String(readRes.SHA1FromBytes(recv)); //create hash in client to crosscheck with what the server sent 
             checkAndRemoveHash(recvHash);           // does what the methods says
 
             buffer.clear();
