@@ -16,21 +16,21 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Set;
 
-
-
 public class Server {
     private Selector selector;
     private ServerSocketChannel serverSocket;
+    private ThreadPoolManager threadPoolManager;
     ReadAndRespond readRes = new ReadAndRespond();
-
     
-    public Server(String hostName, int portNum) throws IOException {
+    public Server(String hostName, int portNum, int threadCount) throws IOException {
         this.selector = Selector.open();
         this.serverSocket = ServerSocketChannel.open();
         
         this.serverSocket.bind( new InetSocketAddress(hostName, portNum));
         this.serverSocket.configureBlocking(false);
         this.serverSocket.register(selector, SelectionKey.OP_ACCEPT);
+
+        this.threadPoolManager = new ThreadPoolManager(threadCount);
     }
 
     public void start() {
