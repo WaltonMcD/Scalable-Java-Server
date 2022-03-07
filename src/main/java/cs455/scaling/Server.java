@@ -16,9 +16,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Set;
 
+
+
 public class Server {
     private Selector selector;
     private ServerSocketChannel serverSocket;
+    ReadAndRespond readRes = new ReadAndRespond();
+
     
     public Server(String hostName, int portNum) throws IOException {
         this.selector = Selector.open();
@@ -53,7 +57,8 @@ public class Server {
 
                 
                 if(key.isReadable()) // Checks if current clients is acceptable key has a value to read.
-                    readAndRespond(key);
+                readRes.readAndRespond(key);
+                //readAndRespond(key);
 
                 iter.remove(); // dont read the same message twice
             }
@@ -84,25 +89,5 @@ public class Server {
         System.out.println("\t\tNew Client Registered... ");
     }
 
-    private void readAndRespond(SelectionKey key) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(1024); // to store the messages
-
-        SocketChannel client = (SocketChannel) key.channel(); // get the right client 
-
-        int bytes = client.read(buffer); // read the buffer
-        if(bytes == 1){  //checks for closing protocol
-            client.close();
-            System.out.println("\t\tClient Has Disconnected... \n");
-        }
-        else{
-            byte[] recvBytes = buffer.array(); // receive the messages
-            String hash = new String(SHA1FromBytes(recvBytes)); // get the hash to send back to the client
-            System.out.println("\t\tReceived: " + hash);
-
-            buffer.flip(); // flips read and write functinalooty
-            
-            client.write(buffer);
-            buffer.clear();
-        }
-    }
+    
 }
