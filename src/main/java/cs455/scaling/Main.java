@@ -21,9 +21,9 @@ public class Main {
         else if(args[1].equals("client")){
             String serverHost = args[2];
             int serverPort = Integer.parseInt(args[3]);
-            // int messageRate = Integer.parseInt(args[4]);
+            int messageRate = Integer.parseInt(args[4]);
 
-            Client client = new Client(serverHost, serverPort);
+            Client client = new Client(serverHost, serverPort, messageRate);
             client.start();
         }
     }

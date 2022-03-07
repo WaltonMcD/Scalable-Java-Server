@@ -6,13 +6,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 
 import java.nio.channels.SocketChannel;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
 public class ReadAndRespond {
-    private final ByteBuffer buffer;
+    private ByteBuffer buffer;
     private final SocketChannel client;
 
     public ReadAndRespond(SelectionKey key){
@@ -41,11 +40,12 @@ public class ReadAndRespond {
         }
         else{
             byte[] recvBytes = buffer.array(); // receive the messages
+            buffer.clear();
             String hash = new String(SHA1FromBytes(recvBytes)); // get the hash to send back to the client
             System.out.println("\t\tReceived: " + hash);
 
-            buffer.flip(); // flips read and write functionality
-            
+            buffer = ByteBuffer.wrap(hash.getBytes());
+
             client.write(buffer);
             buffer.clear();
         }

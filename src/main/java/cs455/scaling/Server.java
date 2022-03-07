@@ -47,6 +47,7 @@ public class Server {
                 if(key.isAcceptable()) // isAcceptable checks for potential new clients
                     register(this.selector, this.serverSocket); // registers the client to the server
 
+
                 if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
                     ReadAndRespond readRes = new ReadAndRespond(key);
                     threadPoolManager.addTask(readRes);
