@@ -51,14 +51,11 @@ public class Server {
                 if(key.isValid() == false)              // corner case 
                     continue;
 
-                
                 if(key.isAcceptable()) // isAcceptable checks for potential new clients
                     register(this.selector, this.serverSocket); // registers the client to the server
 
-                
                 if(key.isReadable()) // Checks if current clients is acceptable key has a value to read.
                 readRes.readAndRespond(key);
-                //readAndRespond(key);
 
                 iter.remove(); // dont read the same message twice
             }
@@ -67,18 +64,6 @@ public class Server {
         catch(IOException ioe){
             System.out.println("Server Error: " + ioe.getMessage());
         }
-    }
-
-    private String SHA1FromBytes(byte[] data) { 
-        BigInteger hashInt = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash  = digest.digest(data); 
-            hashInt = new BigInteger(1, hash); 
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error SHA1: " + e.getMessage());
-        } 
-        return hashInt.toString(16); 
     }
 
     private void register(Selector selector, ServerSocketChannel serverSocket) throws IOException {
