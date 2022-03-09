@@ -18,5 +18,5 @@
 
 ### Execute
 
-- `java -jar build/libs/Homework-2.jar cs455.scaling.Main server [PORT] [THREAD_POOL_SIZE]`
+- `java -jar build/libs/Homework-2.jar cs455.scaling.Main server [PORT] [THREAD_POOL_SIZE] [BATCH_SIZE]`
 - `java -jar build/libs/Homework-2.jar cs455.scaling.Main client [SERVER_HOST] [PORT] [MESSAGE_RATE]`

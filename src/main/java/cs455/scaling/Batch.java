@@ -1,6 +1,5 @@
 package cs455.scaling;
 
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Batch {

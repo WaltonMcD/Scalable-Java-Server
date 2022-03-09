@@ -12,11 +12,19 @@
     },
     {
       "type": "java",
-      "name": "Launch Main",
+      "name": "Launch Client",
       "request": "launch",
       "mainClass": "cs455.scaling.Main",
       "projectName": "Homework-2",
-      "args": "hi client sacramento 8000 4"
+      "args": "placeHolder client sacramento 8000 4"
+    },
+    {
+      "type": "java",
+      "name": "Launch Server",
+      "request": "launch",
+      "mainClass": "cs455.scaling.Main",
+      "projectName": "Homework-2",
+      "args": "placeHolder server 8000 10 5"
     }
   ]
 }

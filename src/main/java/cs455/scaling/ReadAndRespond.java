@@ -1,15 +1,11 @@
 package cs455.scaling;
 import java.io.IOException;
-import java.math.BigInteger;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 
 import java.nio.channels.SocketChannel;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-
 
 public class ReadAndRespond {
     public HashUtility hashUtil = new HashUtility();
@@ -32,8 +28,8 @@ public class ReadAndRespond {
         }
         else{
             byte[] recvBytes = buffer.array(); // receive the messages
-            buffer.clear();
-            
+            //buffer.clear();
+            buffer = ByteBuffer.allocate(40);
             String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
             System.out.println("\t\tReceived: " + hash);
 
@@ -43,6 +39,5 @@ public class ReadAndRespond {
             buffer.clear();
         }
     }
-
 
 }

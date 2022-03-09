@@ -1,13 +1,10 @@
 package cs455.scaling;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -37,10 +34,15 @@ public class Client {
     private void createAndLinkHash(byte[] bytes){
         String hash = hashUtil.SHA1FromBytes(bytes);
         hashList.add(hash);
+        System.out.println("Sent: " + hash);
         System.out.println("List Size: " + hashList.size());
     }
 
     private void checkAndRemoveHash(String hash){
+        if(!this.hashList.contains(hash)){
+            System.out.println("problem");
+        }
+
         if(this.hashList.contains(hash)){
             hashList.remove(hash);
         }
@@ -56,10 +58,11 @@ public class Client {
     
             try{
                 client.write(buffer);                   //write random bytes to the server
-                buffer.clear();                         //clear the buffer so that we can read later
+                //buffer.clear();                         //clear the buffer so that we can read later
+                buffer = ByteBuffer.allocate(40); 
                 client.read(buffer);                    //read the buffer          //convert read stuff to array an store in recv
-                String recv = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
-                String recvHash = recv.substring(0,40);
+                String recvHash = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
+                //String recvHash = recv.substring(0,40);
                 System.out.println("Client Received: " + recvHash);
                 checkAndRemoveHash(recvHash);           // does what the methods says
                 buffer.clear();
