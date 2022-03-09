@@ -11,10 +11,10 @@ public class Main {
             int portNum = Integer.parseInt(args[2]);
             String hostName = InetAddress.getLocalHost().getHostAddress();
             int threadPoolSize = Integer.parseInt(args[3]);
-            // int batchSize = Integer.parseInt(args[4]);
+            int batchSize = Integer.parseInt(args[4]);
             // int batchTime = Integer.parseInt(args[5]);
 
-            Server server = new Server(hostName, portNum, threadPoolSize);
+            Server server = new Server(hostName, portNum, threadPoolSize, batchSize);
             server.start();
 
         }

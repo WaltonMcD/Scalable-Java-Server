@@ -5,11 +5,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPoolManager {
     private final Thread[] workerThreads;
-    private final LinkedBlockingQueue<ReadAndRespond> workerQueue;
+    private final LinkedBlockingQueue<Batch> workerQueue;
 
     public ThreadPoolManager(int threadCount){
         this.workerThreads = new Thread[threadCount];
-        this.workerQueue = new LinkedBlockingQueue<ReadAndRespond>();
+        this.workerQueue = new LinkedBlockingQueue<Batch>();
         int id = 0;
         for(Thread thread: workerThreads){
             thread = new worker(++id);
@@ -17,9 +17,9 @@ public class ThreadPoolManager {
         }
     }
 
-    public void addTask(ReadAndRespond runner){
+    public void addTask(Batch batch){
         try {
-            workerQueue.put(runner);
+            workerQueue.put(batch);
         } catch (InterruptedException e) {
             System.out.println("Manager Add Task: " + e.getMessage());
         }
@@ -37,9 +37,11 @@ public class ThreadPoolManager {
             while(true){
                 try {
                     if(!workerQueue.isEmpty()){
-                        workerQueue.poll().readAndRespond();
+                        Batch aBatch =  workerQueue.take();
+                        for(ReadAndRespond eachMessage: aBatch.getBatch())
+                            eachMessage.readAndRespond();
                     }
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }

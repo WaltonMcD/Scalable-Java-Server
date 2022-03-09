@@ -15,16 +15,19 @@ public class Server {
     private Selector selector;
     private ServerSocketChannel serverSocket;
     private ThreadPoolManager threadPoolManager;
+    private int batchSize;
+    Batch batch;
     
-    public Server(String hostName, int portNum, int threadCount) throws IOException {
+    public Server(String hostName, int portNum, int threadCount, int batchSize) throws IOException {
         this.selector = Selector.open();
         this.serverSocket = ServerSocketChannel.open();
-        
+        this.batchSize = batchSize;
         this.serverSocket.bind( new InetSocketAddress(hostName, portNum));
         this.serverSocket.configureBlocking(false);
         this.serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
         this.threadPoolManager = new ThreadPoolManager(threadCount);
+        batch = new Batch();
     }
 
     public void start() {
@@ -50,7 +53,12 @@ public class Server {
 
                 if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
                     ReadAndRespond readRes = new ReadAndRespond(key);
-                    threadPoolManager.addTask(readRes);
+                    
+                    batch.addTask(readRes);
+                    if(batch.getSize()==batchSize){
+                        threadPoolManager.addTask(batch);
+                        resetBatch();
+                    }
                 }
 
                 iter.remove(); // dont read the same message twice
@@ -68,6 +76,10 @@ public class Server {
         client.configureBlocking(false);
         client.register(this.selector, SelectionKey.OP_READ);
         System.out.println("\t\tNew Client Registered... ");
+    }
+    
+    private void resetBatch(){
+        this.batch = new Batch();
     }
 
     
