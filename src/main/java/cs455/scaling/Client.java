@@ -16,6 +16,7 @@ public class Client {
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
     private int messageRate;
+    HashUtility hashUtil = new HashUtility();
 
     public Client(String hostName, int portNum, int messageRate) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
@@ -24,17 +25,7 @@ public class Client {
         this.messageRate = messageRate;
     }
 
-    public String SHA1FromBytes(byte[] data) { 
-        BigInteger hashInt = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash  = digest.digest(data); 
-            hashInt = new BigInteger(1, hash); 
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error SHA1: " + e.getMessage());
-        } 
-        return hashInt.toString(16); 
-    }
+   
     
     private byte[] getRandomBytes(){
         Random random = new Random();
@@ -44,7 +35,7 @@ public class Client {
     }
 
     private void createAndLinkHash(byte[] bytes){
-        String hash = SHA1FromBytes(bytes);
+        String hash = hashUtil.SHA1FromBytes(bytes);
         hashList.add(hash);
         System.out.println("List Size: " + hashList.size());
     }

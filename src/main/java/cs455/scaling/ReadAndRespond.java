@@ -8,27 +8,19 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 
 
 public class ReadAndRespond {
+    public HashUtility hashUtil = new HashUtility();
     private ByteBuffer buffer;
     private final SocketChannel client;
+    private static final HashMap<SocketChannel, Integer> clientSentMessages = new HashMap<>();
 
     public ReadAndRespond(SelectionKey key){
         this.buffer = ByteBuffer.allocate(1024); // to store the messages
         this.client = (SocketChannel) key.channel(); // get the right client 
-    }
- 
-    public String SHA1FromBytes(byte[] data) { 
-        BigInteger hashInt = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA1");
-            byte[] hash  = digest.digest(data); 
-            hashInt = new BigInteger(1, hash); 
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error SHA1: " + e.getMessage());
-        } 
-        return hashInt.toString(16); 
+        clientSentMessages.put(client,clientSentMessages.getOrDefault(client, 0) + 1); // Start with 1. Then increment with each message
     }
 
     public void readAndRespond() throws IOException {
@@ -41,7 +33,8 @@ public class ReadAndRespond {
         else{
             byte[] recvBytes = buffer.array(); // receive the messages
             buffer.clear();
-            String hash = new String(SHA1FromBytes(recvBytes)); // get the hash to send back to the client
+            
+            String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
             System.out.println("\t\tReceived: " + hash);
 
             buffer = ByteBuffer.wrap(hash.getBytes());
