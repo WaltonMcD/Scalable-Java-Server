@@ -1,10 +1,13 @@
 package cs455.scaling;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -12,7 +15,6 @@ public class Client {
     private SocketChannel client;
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
-    ReadAndRespond readRes = new ReadAndRespond();
     private int messageRate;
 
     public Client(String hostName, int portNum, int messageRate) throws IOException {
@@ -20,6 +22,18 @@ public class Client {
         this.buffer = ByteBuffer.allocate(1024);
         this.hashList = new LinkedList<String>();
         this.messageRate = messageRate;
+    }
+
+    public String SHA1FromBytes(byte[] data) { 
+        BigInteger hashInt = null;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA1");
+            byte[] hash  = digest.digest(data); 
+            hashInt = new BigInteger(1, hash); 
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error SHA1: " + e.getMessage());
+        } 
+        return hashInt.toString(16); 
     }
     
     private byte[] getRandomBytes(){
@@ -30,7 +44,7 @@ public class Client {
     }
 
     private void createAndLinkHash(byte[] bytes){
-        String hash = readRes.SHA1FromBytes(bytes);
+        String hash = SHA1FromBytes(bytes);
         hashList.add(hash);
         System.out.println("List Size: " + hashList.size());
     }
