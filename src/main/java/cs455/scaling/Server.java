@@ -32,49 +32,51 @@ public class Server {
 
     public void start() {
         try{
-        while(true){
-            System.out.println("Listening For New Connections... "); 
+            while(true){
+                System.out.println("Listening For New Connections... "); 
 
-            this.selector.select();                             //Blocking call. 
-            System.out.println("\tActivity On Selector... "); 
+                this.selector.select();                             //Blocking call. 
+                System.out.println("\tActivity On Selector... "); 
 
-            Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
+                Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
 
-            Iterator<SelectionKey> iter = selectedKeys.iterator(); //make the messages iterable
-            while(iter.hasNext()){
-                SelectionKey key = iter.next();                    // get the key
-                
-                if(key.isValid() == false)              // corner case 
-                    continue;
-
-                if(key.isAcceptable()) // isAcceptable checks for potential new clients
-                    register(this.selector, this.serverSocket); // registers the client to the server
-
-
-                if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
-                    ReadAndRespond readRes = new ReadAndRespond(key);
+                Iterator<SelectionKey> iter = selectedKeys.iterator(); //make the messages iterable
+                while(iter.hasNext()){
+                    SelectionKey key = iter.next();                    // get the key
                     
-                    batch.addTask(readRes);
-                    if(batch.getSize()==batchSize){
-                        threadPoolManager.addTask(batch);
-                        resetBatch();
-                    }
-                }
+                    if(key.isValid() == false)              // corner case 
+                        continue;
 
-                iter.remove(); // dont read the same message twice
+                    if(key.isAcceptable()) // isAcceptable checks for potential new clients
+                        if(key.attachment() == null){
+                            register(this.selector, this.serverSocket, 42); // registers the client to the server
+                        }
+                        
+                    if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
+                        if(key.attachment() != null){
+                            ReadAndRespond readRes = new ReadAndRespond(key);
+                            batch.addTask(readRes);
+                            
+                            if(batch.getSize()==batchSize){
+                                threadPoolManager.addTask(batch);
+                                resetBatch();
+                            }
+                        }      
+                    }
+                    iter.remove(); // dont read the same message twice
+                }
             }
-        }
         }
         catch(IOException ioe){
             System.out.println("Server Error: " + ioe.getMessage());
         }
     }
 
-    private void register(Selector selector, ServerSocketChannel serverSocket) throws IOException {
+    private void register(Selector selector, ServerSocketChannel serverSocket, int object) throws IOException {
         SocketChannel client = this.serverSocket.accept();
 
         client.configureBlocking(false);
-        client.register(this.selector, SelectionKey.OP_READ);
+        client.register(this.selector, SelectionKey.OP_READ, object);
         System.out.println("\t\tNew Client Registered... ");
     }
     
