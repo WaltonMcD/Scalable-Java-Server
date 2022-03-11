@@ -12,10 +12,11 @@ public class Main {
             String hostName = InetAddress.getLocalHost().getHostAddress();
             int threadPoolSize = Integer.parseInt(args[3]);
             int batchSize = Integer.parseInt(args[4]);
-            // int batchTime = Integer.parseInt(args[5]);
+            int batchTime = Integer.parseInt(args[5]);
 
-            Server server = new Server(hostName, portNum, threadPoolSize, batchSize);
+            Server server = new Server(hostName, portNum, threadPoolSize, batchSize, batchTime);
             server.start();
+           
 
         }
         else if(args[1].equals("client")){

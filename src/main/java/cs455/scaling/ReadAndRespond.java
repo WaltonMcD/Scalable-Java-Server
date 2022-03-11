@@ -31,6 +31,9 @@ public class ReadAndRespond {
             //buffer.clear();
             buffer = ByteBuffer.allocate(40);
             String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
+            if(hash.equals("60cacbf3d72e1e7834203da608037b1bf83b40e8")){
+                return;
+            }
             System.out.println("\t\tReceived: " + hash);
 
             buffer = ByteBuffer.wrap(hash.getBytes());

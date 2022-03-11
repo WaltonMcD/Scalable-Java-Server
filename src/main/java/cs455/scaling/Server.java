@@ -10,28 +10,54 @@ import java.nio.channels.SocketChannel;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Server {
     private Selector selector;
     private ServerSocketChannel serverSocket;
     private ThreadPoolManager threadPoolManager;
     private int batchSize;
-    Batch batch;
+    private int batchTime;
+    Batch currentBatch;
+    boolean batchSizeReached = false;
+    Object lock;
     
-    public Server(String hostName, int portNum, int threadCount, int batchSize) throws IOException {
+    public Server(String hostName, int portNum, int threadCount, int batchSize, int batchTime) throws IOException {
         this.selector = Selector.open();
         this.serverSocket = ServerSocketChannel.open();
         this.batchSize = batchSize;
+        this.batchTime = batchTime;
         this.serverSocket.bind( new InetSocketAddress(hostName, portNum));
         this.serverSocket.configureBlocking(false);
         this.serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
         this.threadPoolManager = new ThreadPoolManager(threadCount);
-        batch = new Batch();
+        currentBatch = new Batch();
+       
+    }
+    public class Intervals extends Thread{
+        public void run(){
+            while(true){
+                long test = System.currentTimeMillis();
+                if(test >= (batchTime * 1000)) { //multiply by 1000 to get milliseconds
+                    synchronized (lock){
+                        if(currentBatch.getSize()>0){
+                            resetBatch();
+                            System.out.print("called by time");
+                         }
+                    }
+                }
+            }
+        }
     }
 
     public void start() {
         try{
+            Intervals obj = new Intervals();
+            Thread thread = obj;
+            thread.start();
+
             while(true){
                 System.out.println("Listening For New Connections... "); 
 
@@ -55,10 +81,9 @@ public class Server {
                     if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
                         if(key.attachment() != null){
                             ReadAndRespond readRes = new ReadAndRespond(key);
-                            batch.addTask(readRes);
+                            currentBatch.addTask(readRes);
                             
-                            if(batch.getSize()==batchSize){
-                                threadPoolManager.addTask(batch);
+                            if(currentBatch.getSize()==batchSize){
                                 resetBatch();
                             }
                         }      
@@ -80,9 +105,14 @@ public class Server {
         System.out.println("\t\tNew Client Registered... ");
     }
     
-    private void resetBatch(){
-        this.batch = new Batch();
-    }
+   
+    
+        private void resetBatch(){
+        threadPoolManager.addTask(currentBatch);
+        currentBatch = new Batch();
+       
+        }
+    
 
     
 }
