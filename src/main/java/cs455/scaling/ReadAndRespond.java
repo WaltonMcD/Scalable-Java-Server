@@ -19,25 +19,31 @@ public class ReadAndRespond {
         clientSentMessages.put(client,clientSentMessages.getOrDefault(client, 0) + 1); // Start with 1. Then increment with each message
     }
 
-    public void readAndRespond() throws IOException {
+    public synchronized void readAndRespond() {
+            try{
+                int flag = client.read(buffer); // read the buffer
+                if(flag == 0){
+                    return;
+                }
+                byte[] recvBytes = buffer.array(); // receive the messages
+                buffer.clear();
 
-        int bytes = client.read(buffer); // read the buffer
-        if(bytes == 1){  //checks for closing protocol
-            client.close();
-            System.out.println("\t\tClient Has Disconnected... \n");
-        }
-        else{
-            byte[] recvBytes = buffer.array(); // receive the messages
-            //buffer.clear();
-            buffer = ByteBuffer.allocate(40);
-            String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
-            System.out.println("\t\tReceived: " + hash);
+                buffer = ByteBuffer.allocate(40);
+                System.out.println(recvBytes);
+                String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
+                System.out.println(hash);
+                System.out.println("\t\tReceived: " + hash);
 
-            buffer = ByteBuffer.wrap(hash.getBytes());
-
-            client.write(buffer);
-            buffer.clear();
-        }
+                buffer = ByteBuffer.wrap(hash.getBytes());
+                client.write(buffer);
+                buffer.clear();
+                
+            }
+            catch(IOException ioe){
+                ioe.printStackTrace();
+            }
+            
+        
     }
 
 }
