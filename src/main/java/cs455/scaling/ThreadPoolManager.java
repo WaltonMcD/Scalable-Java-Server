@@ -41,7 +41,7 @@ public class ThreadPoolManager {
                         for(ReadAndRespond eachMessage: aBatch.getBatch())
                             eachMessage.readAndRespond();
                     }
-                } catch (IOException | InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
