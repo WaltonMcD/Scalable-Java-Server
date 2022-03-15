@@ -18,7 +18,7 @@ if [[ $# < 1 ]]; then
     exit 1
 fi
 
-if [[ $# < "help" ]]; then
+if [[ $# = "help" ]]; then
     echo -e "$USAGE"
     exit 1
 fi
