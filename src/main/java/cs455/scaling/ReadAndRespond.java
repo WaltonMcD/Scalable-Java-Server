@@ -6,6 +6,7 @@ import java.nio.channels.SelectionKey;
 
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,14 +20,6 @@ public class ReadAndRespond {
     public ReadAndRespond(SelectionKey key){
         this.buffer = ByteBuffer.allocate(1024); // to store the messages
         this.client = (SocketChannel) key.channel(); // get the right client 
-        
-        if (!clientSentMessages.containsKey(client)) {
-            clientSentMessages.put(client, new AtomicInteger(1));
-        } else {
-            // socketChannel already exists
-            AtomicInteger numMessagesSent = clientSentMessages.get(client);
-            numMessagesSent.getAndIncrement();
-        }
     }
 
     public synchronized void readAndRespond() {
@@ -35,14 +28,22 @@ public class ReadAndRespond {
                 if(flag == 0){
                     return;
                 }
+
+                if (!clientSentMessages.containsKey(client)) {
+                    clientSentMessages.put(client, new AtomicInteger(1));
+                } else {
+                    // socketChannel already exists
+                    AtomicInteger numMessagesSent = clientSentMessages.get(client);
+                    numMessagesSent.getAndIncrement();
+                }
+
                 byte[] recvBytes = buffer.array(); // receive the messages
                 buffer.clear();
 
                 buffer = ByteBuffer.allocate(40);
-                System.out.println(recvBytes);
                 String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
-                System.out.println(hash);
-                System.out.println("\t\tReceived: " + hash);
+                // System.out.println(hash);
+                // System.out.println("\t\tReceived: " + hash);
 
                 buffer = ByteBuffer.wrap(hash.getBytes());
                 client.write(buffer);
@@ -60,11 +61,17 @@ public class ReadAndRespond {
         return numMessagesDone;
     }
 
-    public static void resetNumMessagesProcessed() {
+    public static void resetNumMessagesDone() {
         numMessagesDone.set(0);
     }
     public static HashMap<SocketChannel, AtomicInteger> getClientNumSentMessages () {
         return clientSentMessages;
+    }
+
+    public static void clearHashMap(){
+        for(AtomicInteger temp : clientSentMessages.values()){
+            temp.set(0);
+        }
     }
 
 }
