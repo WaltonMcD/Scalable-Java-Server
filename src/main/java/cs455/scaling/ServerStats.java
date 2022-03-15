@@ -40,6 +40,8 @@ public class ServerStats extends TimerTask{
                             "Std. Dev. Of Per-client Throughput: " + standardDeviation + "messages/s");
 
         ReadAndRespond.resetNumMessagesDone();
+        ReadAndRespond.clearHashMap();
+        throughputs = new ArrayList<>();
 
 
 
