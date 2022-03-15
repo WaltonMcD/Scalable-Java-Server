@@ -60,7 +60,7 @@ public class ReadAndRespond {
         return numMessagesDone;
     }
 
-    public static void resetNumMessagesProcessed() {
+    public static void resetNumMessagesDone() {
         numMessagesDone.set(0);
     }
     public static HashMap<SocketChannel, AtomicInteger> getClientNumSentMessages () {
