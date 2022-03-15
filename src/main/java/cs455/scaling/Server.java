@@ -17,6 +17,7 @@ public class Server {
     private ServerSocketChannel serverSocket;
     private ThreadPoolManager threadPoolManager;
     private int batchSize;
+    private int batchTime;
     Batch batch;
     private static AtomicInteger numClients = new AtomicInteger(0);
 
@@ -35,11 +36,12 @@ public class Server {
 
     public void start() {
         try{
+             
+            Thread thread = new Scheduler(batchTime);
+            thread.start();
             while(true){
-                System.out.println("Listening For New Connections... "); 
 
                 this.selector.select();                             //Blocking call. 
-                System.out.println("\tActivity On Selector... "); 
 
                 Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
 
@@ -82,7 +84,7 @@ public class Server {
 
         client.configureBlocking(false);
         client.register(this.selector, SelectionKey.OP_READ, object);
-        System.out.println("\t\tNew Client Registered... ");
+        // System.out.println("\t\tNew Client Registered... ");
     }
     
     private void resetBatch(){

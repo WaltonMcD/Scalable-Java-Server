@@ -23,7 +23,7 @@ public class Register implements Runnable{
             SocketChannel client = this.serverSocket.accept();
             client.configureBlocking(false);
             client.register(this.selector, SelectionKey.OP_READ, object);
-            System.out.println("\t\tNew Client Registered... ");
+            // System.out.println("\t\tNew Client Registered... ");
         }
         catch( IOException e){
             e.printStackTrace();

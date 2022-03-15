@@ -34,10 +34,12 @@ public class ServerStats extends TimerTask{
         double squareThis = sumOfMeanMinusIndividual / clientNumSentMessages.size();
         double standardDeviation = Math.sqrt(squareThis);
 
-        System.out.print("ServerThroughput: " + serverThroughput + "Message/s" + 
+        System.out.println("ServerThroughput: " + serverThroughput + "Message/s" + 
                             "Active Client Connections: " + numClients +
                             " Mean Perclient Throughput: " + mean + " messages/s" + 
                             "Std. Dev. Of Per-client Throughput: " + standardDeviation + "messages/s");
+
+        ReadAndRespond.resetNumMessagesDone();
 
 
 
