@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
     private Selector selector;
@@ -17,6 +18,8 @@ public class Server {
     private ThreadPoolManager threadPoolManager;
     private int batchSize;
     Batch batch;
+    private static AtomicInteger numClients = new AtomicInteger(0);
+
     
     public Server(String hostName, int portNum, int threadCount, int batchSize) throws IOException {
         this.selector = Selector.open();
@@ -50,12 +53,14 @@ public class Server {
                     if(key.isAcceptable()) // isAcceptable checks for potential new clients
                         if(key.attachment() == null){
                             register(this.selector, this.serverSocket, 42); // registers the client to the server
+                            numClients.getAndIncrement();
                         }
                         
                     if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
                         if(key.attachment() != null){
                             ReadAndRespond readRes = new ReadAndRespond(key);
                             batch.addTask(readRes);
+
                             
                             if(batch.getSize()==batchSize){
                                 threadPoolManager.addTask(batch);
@@ -82,6 +87,9 @@ public class Server {
     
     private void resetBatch(){
         this.batch = new Batch();
+    }
+    public static AtomicInteger getNumClients() {
+        return numClients;
     }
 
     
