@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ReadAndRespond {
+public class ReadAndRespond implements Runnable{
     public HashUtility hashUtil = new HashUtility();
     private ByteBuffer buffer;
     private final SocketChannel client;
@@ -22,7 +22,7 @@ public class ReadAndRespond {
         this.client = (SocketChannel) key.channel(); // get the right client 
     }
 
-    public synchronized void readAndRespond() {
+    public synchronized void run() {
             try{
                 int flag = client.read(buffer); // read the buffer
                 if(flag == 0){
@@ -42,8 +42,6 @@ public class ReadAndRespond {
 
                 buffer = ByteBuffer.allocate(40);
                 String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
-                // System.out.println(hash);
-                // System.out.println("\t\tReceived: " + hash);
 
                 buffer = ByteBuffer.wrap(hash.getBytes());
                 client.write(buffer);
