@@ -21,9 +21,11 @@ public class Register implements Runnable{
     public void run() {
         try{
             SocketChannel client = this.serverSocket.accept();
+            if(client == null){
+                return;
+            }
             client.configureBlocking(false);
             client.register(this.selector, SelectionKey.OP_READ, object);
-            // System.out.println("\t\tNew Client Registered... ");
         }
         catch( IOException e){
             e.printStackTrace();

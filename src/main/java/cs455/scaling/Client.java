@@ -13,17 +13,20 @@ public class Client {
     private ByteBuffer buffer;
     private LinkedList<String> hashList;
     private int messageRate;
+    private int totalSentMessages;
+    private int totalReceivedMessages;
     HashUtility hashUtil = new HashUtility();
+
 
     public Client(String hostName, int portNum, int messageRate) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
         this.buffer = ByteBuffer.allocate(1024);
         this.hashList = new LinkedList<String>();
         this.messageRate = messageRate;
+        this.totalSentMessages = 0;
+        this.totalReceivedMessages = 0;
     }
 
-   
-    
     private byte[] getRandomBytes(){
         Random random = new Random();
         byte[] randomBytes = new byte[1024];
@@ -39,10 +42,6 @@ public class Client {
     }
 
     private void checkAndRemoveHash(String hash){
-        if(!this.hashList.contains(hash)){
-            System.out.println("problem");
-        }
-
         if(this.hashList.contains(hash)){
             hashList.remove(hash);
         }
@@ -57,12 +56,13 @@ public class Client {
             buffer = ByteBuffer.wrap(randomBytes);      // wrap/ load bytes to send to server
     
             try{
-                client.write(buffer);                   //write random bytes to the server
-                //buffer.clear();                         //clear the buffer so that we can read later
+                client.write(buffer);
+                totalSentMessages++;                   //write random bytes to the server
+                buffer.clear();                         //clear the buffer so that we can read later
                 buffer = ByteBuffer.allocate(40); 
-                client.read(buffer);                    //read the buffer          //convert read stuff to array an store in recv
+                client.read(buffer);
+                totalReceivedMessages++;                    //read the buffer          //convert read stuff to array an store in recv
                 String recvHash = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
-                //String recvHash = recv.substring(0,40);
                 System.out.println("Client Received: " + recvHash);
                 checkAndRemoveHash(recvHash);           // does what the methods says
                 buffer.clear();
@@ -74,5 +74,13 @@ public class Client {
             }
         }
         
+    }
+
+    public int getTotalSentMessages() {
+        return totalSentMessages;
+    }
+
+    public int getTotalReceivedMessages() {
+        return totalReceivedMessages;
     }
 }

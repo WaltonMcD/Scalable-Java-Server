@@ -22,26 +22,27 @@ public class Server {
     private static AtomicInteger numClients = new AtomicInteger(0);
 
     
-    public Server(String hostName, int portNum, int threadCount, int batchSize) throws IOException {
+    public Server(String hostName, int portNum, int threadCount, int batchSize, int batchTime) throws IOException {
         this.selector = Selector.open();
         this.serverSocket = ServerSocketChannel.open();
-        this.batchSize = batchSize;
         this.serverSocket.bind( new InetSocketAddress(hostName, portNum));
         this.serverSocket.configureBlocking(false);
         this.serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
         this.threadPoolManager = new ThreadPoolManager(threadCount);
-        batch = new Batch();
+        this.batch = new Batch();
+        this.batchSize = batchSize;
+        this.batchTime = batchTime;
     }
 
     public void start() {
         try{
              
-            Thread thread = new Scheduler(batchTime);
+            Thread thread = new Scheduler(batchTime, this);
             thread.start();
             while(true){
 
-                this.selector.select();                             //Blocking call. 
+                int flag = this.selector.select();                             //Blocking call. 
 
                 Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
 
@@ -54,8 +55,14 @@ public class Server {
 
                     if(key.isAcceptable()) // isAcceptable checks for potential new clients
                         if(key.attachment() == null){
-                            register(this.selector, this.serverSocket, 42); // registers the client to the server
+                            Register register = new Register(this.selector, this.serverSocket, 42); // registers the client to the server
+                            batch.addTask(register);
                             numClients.getAndIncrement();
+
+                            if(batch.getSize()==batchSize){
+                                threadPoolManager.addTask(batch);
+                                resetBatch();
+                            }
                         }
                         
                     if(key.isReadable()){ // Checks if current clients is acceptable key has a value to read.
@@ -63,7 +70,6 @@ public class Server {
                             ReadAndRespond readRes = new ReadAndRespond(key);
                             batch.addTask(readRes);
 
-                            
                             if(batch.getSize()==batchSize){
                                 threadPoolManager.addTask(batch);
                                 resetBatch();
@@ -78,16 +84,8 @@ public class Server {
             System.out.println("Server Error: " + ioe.getMessage());
         }
     }
-
-    private void register(Selector selector, ServerSocketChannel serverSocket, int object) throws IOException {
-        SocketChannel client = this.serverSocket.accept();
-
-        client.configureBlocking(false);
-        client.register(this.selector, SelectionKey.OP_READ, object);
-        // System.out.println("\t\tNew Client Registered... ");
-    }
     
-    private void resetBatch(){
+    public void resetBatch(){
         this.batch = new Batch();
     }
     public static AtomicInteger getNumClients() {

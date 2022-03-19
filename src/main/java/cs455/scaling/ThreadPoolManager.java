@@ -38,8 +38,8 @@ public class ThreadPoolManager {
                 try {
                     if(!workerQueue.isEmpty()){
                         Batch aBatch =  workerQueue.take();
-                        for(ReadAndRespond eachMessage: aBatch.getBatch())
-                            eachMessage.readAndRespond();
+                        for(Runnable eachMessage: aBatch.getBatch())
+                            eachMessage.run();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
