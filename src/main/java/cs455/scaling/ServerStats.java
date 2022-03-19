@@ -1,6 +1,5 @@
 package cs455.scaling;
 
-import java.lang.management.ThreadInfo;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +33,10 @@ public class ServerStats extends TimerTask{
         double squareThis = sumOfMeanMinusIndividual / clientNumSentMessages.size();
         double standardDeviation = Math.sqrt(squareThis);
 
-        System.out.println("ServerThroughput: " + serverThroughput + "Message/s" + 
+        System.out.println("ServerThroughput: " + serverThroughput + " Message/s " + 
                             "Active Client Connections: " + numClients +
-                            " Mean Perclient Throughput: " + mean + " messages/s" + 
-                            "Std. Dev. Of Per-client Throughput: " + standardDeviation + "messages/s");
+                            " Mean Per-client Throughput: " + mean + " messages/s " + 
+                            "Std. Dev. Of Per-client Throughput: " + standardDeviation + " messages/s");
 
         ReadAndRespond.resetNumMessagesDone();
         ReadAndRespond.clearHashMap();
