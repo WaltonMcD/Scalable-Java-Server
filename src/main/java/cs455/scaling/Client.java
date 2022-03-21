@@ -63,10 +63,11 @@ public class Client {
                 client.write(buffer);
                 totalSentMessages++;                   //write random bytes to the server
                 buffer.clear();                         //clear the buffer so that we can read later
-                buffer = ByteBuffer.allocate(40); 
+                buffer.flip(); 
                 client.read(buffer);
                 totalReceivedMessages++;                    //read the buffer          //convert read stuff to array an store in recv
-                String recvHash = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
+                String recv = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
+                String recvHash = recv.substring(0,40);
                 checkAndRemoveHash(recvHash);           // does what the methods says
                 buffer.clear();
                 Thread.sleep(1000/messageRate);
@@ -76,13 +77,5 @@ public class Client {
                 System.err.println("Client failed to sleep: " + ie.getMessage());
             }
         }
-    }
-
-    public int getTotalSentMessages() {
-        return totalSentMessages;
-    }
-
-    public int getTotalReceivedMessages() {
-        return totalReceivedMessages;
     }
 }
