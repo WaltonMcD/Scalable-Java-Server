@@ -16,6 +16,7 @@ public class Batch {
     public int getSize(){
         return batch.size();
     }
+    
     public LinkedBlockingQueue<Runnable> getBatch(){
         return batch;
     }

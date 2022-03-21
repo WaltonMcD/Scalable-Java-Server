@@ -7,6 +7,8 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Client {
     private SocketChannel client;
@@ -16,7 +18,6 @@ public class Client {
     private int totalSentMessages;
     private int totalReceivedMessages;
     HashUtility hashUtil = new HashUtility();
-
 
     public Client(String hostName, int portNum, int messageRate) throws IOException {
         this.client = SocketChannel.open(new InetSocketAddress(hostName, portNum));
@@ -37,18 +38,21 @@ public class Client {
     private void createAndLinkHash(byte[] bytes){
         String hash = hashUtil.SHA1FromBytes(bytes);
         hashList.add(hash);
-        System.out.println("Sent: " + hash);
-        System.out.println("List Size: " + hashList.size());
     }
 
     private void checkAndRemoveHash(String hash){
         if(this.hashList.contains(hash)){
             hashList.remove(hash);
         }
-        System.out.println("List Size: " + hashList.size());
     }
 
     public void start(){
+        Timer timerPrint = new Timer();
+        timerPrint.scheduleAtFixedRate(new TimerTask() {
+                    public void run(){
+                        System.out.println("Total Sent Count: " + totalSentMessages + " Total Received Count: " + totalReceivedMessages);
+                    }
+                }, 0L, 20000L );
 
         while(true){
             byte[] randomBytes = getRandomBytes();      //The random bytes that needs to be sent to the server
@@ -63,7 +67,6 @@ public class Client {
                 client.read(buffer);
                 totalReceivedMessages++;                    //read the buffer          //convert read stuff to array an store in recv
                 String recvHash = new String(buffer.array(), StandardCharsets.UTF_8); //create hash in client to crosscheck with what the server sent 
-                System.out.println("Client Received: " + recvHash);
                 checkAndRemoveHash(recvHash);           // does what the methods says
                 buffer.clear();
                 Thread.sleep(1000/messageRate);
@@ -73,7 +76,6 @@ public class Client {
                 System.err.println("Client failed to sleep: " + ie.getMessage());
             }
         }
-        
     }
 
     public int getTotalSentMessages() {

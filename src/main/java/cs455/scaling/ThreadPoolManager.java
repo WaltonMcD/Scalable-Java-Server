@@ -1,6 +1,5 @@
 package cs455.scaling;
 
-import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPoolManager {

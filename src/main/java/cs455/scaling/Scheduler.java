@@ -19,7 +19,7 @@ public class Scheduler extends Thread{
         ServerStats stats = new ServerStats();
         long batchTimeLong = batchTime;
         
-        timerPrint.scheduleAtFixedRate(stats, 0L, 5300L);
+        timerPrint.scheduleAtFixedRate(stats, 0L, 20000L);
         timerBatch.scheduleAtFixedRate(new TimerTask() {
             public void run(){
                 server.resetBatch();
