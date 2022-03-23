@@ -1,8 +1,6 @@
-albany
 atlanta
 augusta
 austin
-baton-rouge
 bismarck
 boise
 boston
@@ -81,8 +79,7 @@ mackerel
 marlin        
 perch         
 pollock       
-sardine       
-shark         
+sardine            
 sole          
 swordfish     
 tarpon        
@@ -99,7 +96,6 @@ copper-mtn
 crested-butte
 eldora
 grandby-ranch
-aspen-highlands
 howelsen-hill
 keystone
 loveland
@@ -115,7 +111,6 @@ telluride
 vail
 winter-park
 wolf-creek
-
 albany
 atlanta
 augusta

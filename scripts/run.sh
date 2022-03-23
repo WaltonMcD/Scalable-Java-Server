@@ -5,11 +5,11 @@ USAGE="
   ./run.sh [OPTION] [OPTIONAL_ARGS]
   Options:
     deploy: run 1 server and specified number of clients on hosts specified in hostmachines.txt. If no arguments are provided defaults will be used.
-      Ex sh scripts/run.sh deploy [SERVER_PORT=8000] [THREAD_POOL_SIZE=10] [BATCH_SIZE=10] [MESSAGE_RATE=4] [NUMBER_OF_CLIENTS=100]
+      Ex sh scripts/run.sh deploy [SERVER_PORT=8001] [THREAD_POOL_SIZE=10] [BATCH_SIZE=10][BATCH_TIME=10] [MESSAGE_RATE=4] [NUMBER_OF_CLIENTS=100]
     server: run 1 server on localhost. If no arguments are provided defaults will be used.
-      Ex sh scripts/run.sh server [SERVER_PORT=8000] [THREAD_POOL_SIZE=10] [BATCH_SIZE=10]
+      Ex sh scripts/run.sh server [SERVER_PORT=8001] [THREAD_POOL_SIZE=10] [BATCH_SIZE=10] [BATCH_TIME=10]
     client: run 1 client on localhost. If no arguments are provided defaults will be used.
-      Ex sh/run.sh client [SERVER_HOST=localhost] [SERVER_PORT=8000] [MESSAGE_RATE=4]
+      Ex sh/run.sh client [SERVER_HOST=localhost] [SERVER_PORT=8001] [MESSAGE_RATE=4]
     clean: Kills tmux sessions on machines listed in current_machines.txt (logged by deploy option)
     ssh:  set up ssh keys between all hosts in hostmachines.txt\n"
 
@@ -40,11 +40,12 @@ fi
 
 if [[ $1 = "deploy" ]]; then
     gradle build
-    SERVER_PORT=${2:-8000}
+    SERVER_PORT=${2:-8001}
     THREAD_POOL_SIZE=${3:-10}
     BATCH_SIZE=${4:-10}
-    MESSAGE_RATE=${4:-4}
-    NUMBER_OF_CLIENTS=${5:-100}
+    BATCH_TIME=${5:-10}
+    MESSAGE_RATE=${6:-4}
+    NUMBER_OF_CLIENTS=${7:-100}
 
     PROJECT_DIR=$(pwd)
     echo $PROJECT_DIR
@@ -56,7 +57,7 @@ if [[ $1 = "deploy" ]]; then
     echo -e "$SERVER\n$CLIENTS" > scripts/current_tmux_sessions.txt
     
     echo "Server: " ${machines[0]}
-    ssh ${SERVER} "tmux new -d -s ${SERVER} '${BASE_CMD} server ${SERVER_PORT} ${THREAD_POOL_SIZE} ${BATCH_SIZE}' "
+    ssh ${SERVER} "tmux new -d -s ${SERVER} '${BASE_CMD} server ${SERVER_PORT} ${THREAD_POOL_SIZE} ${BATCH_SIZE} ${BATCH_TIME}' "
 
     echo "Clients: " ${CLIENTS[@]}
     i=1
@@ -83,16 +84,17 @@ CLASS_NAME=$1
 BASE_COMMAND="java -jar build/libs/Homework-2.jar cs455.scaling.Main"
 
 if [[ $CLASS_NAME = "server" ]]; then
-    SERVER_PORT=${2:-8000}
+    SERVER_PORT=${2:-8001}
     THREAD_POOL_SIZE=${3:-10}
     BATCH_SIZE=${4:-10}
+    BATCH_TIME=${4:-10}
     echo "Starting Server..."
-    $BASE_COMMAND server $SERVER_PORT $THREAD_POOL_SIZE $BATCH_SIZE
+    $BASE_COMMAND server $SERVER_PORT $THREAD_POOL_SIZE $BATCH_SIZE $BATCH_SIZE
 fi
 
 if [[ $CLASS_NAME = "client" ]]; then
     SERVER_HOST=${2:-localhost}
-    SERVER_PORT=${3:-8000}
+    SERVER_PORT=${3:-8001}
     MESSAGE_RATE=${4:-4}
     echo "Starting Client..."
     $BASE_COMMAND client $SERVER_HOST $SERVER_PORT $MESSAGE_RATE
