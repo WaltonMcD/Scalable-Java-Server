@@ -41,7 +41,10 @@ public class Server {
             thread.start();
             while(true){
 
-                int flag = this.selector.select();                             //Blocking call. 
+                int flag = this.selector.select();  //Blocking call. 
+                if(flag != 0){
+                    continue;
+                }                             
 
                 Set<SelectionKey> selectedKeys = selector.selectedKeys(); // set of all received types of messages 
 
