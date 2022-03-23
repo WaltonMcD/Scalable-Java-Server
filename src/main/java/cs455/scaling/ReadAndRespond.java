@@ -38,10 +38,9 @@ public class ReadAndRespond implements Runnable{
 
                 byte[] recvBytes = buffer.array(); // receive the messages
                 buffer.clear();
+                buffer.flip();
 
-                buffer = ByteBuffer.allocate(40);
                 String hash = hashUtil.SHA1FromBytes(recvBytes); // get the hash to send back to the client
-
                 buffer = ByteBuffer.wrap(hash.getBytes());
                 client.write(buffer);
                 buffer.clear();

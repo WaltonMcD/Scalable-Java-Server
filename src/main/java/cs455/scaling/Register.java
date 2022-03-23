@@ -5,6 +5,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Register implements Runnable{
     private Selector selector;
@@ -24,6 +25,9 @@ public class Register implements Runnable{
             if(client == null){
                 return;
             }
+
+            AtomicInteger numClients = Server.getNumClients();
+            numClients.getAndIncrement();
             client.configureBlocking(false);
             client.register(this.selector, SelectionKey.OP_READ, object);
         }

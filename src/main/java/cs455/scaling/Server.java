@@ -59,7 +59,6 @@ public class Server {
                         if(key.attachment() == null){
                             Register register = new Register(this.selector, this.serverSocket, 42); // registers the client to the server
                             batch.addTask(register);
-                            numClients.getAndIncrement();
 
                             if(batch.getSize()==batchSize){
                                 threadPoolManager.addTask(batch);
